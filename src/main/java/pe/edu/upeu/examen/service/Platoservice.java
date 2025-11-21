@@ -1,8 +1,5 @@
 package pe.edu.upeu.examen.service;
-
-
 import pe.edu.upeu.examen.entities.Plato;
-
 import java.util.List;
 
 public interface Platoservice {

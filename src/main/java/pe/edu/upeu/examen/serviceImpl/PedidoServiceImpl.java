@@ -3,7 +3,7 @@ package pe.edu.upeu.examen.serviceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pe.edu.upeu.examen.dto.PedidoDTO; // Asegúrate de crear esta clase (ver abajo)
+import pe.edu.upeu.examen.dto.PedidoDTO;
 import pe.edu.upeu.examen.entities.Cliente;
 import pe.edu.upeu.examen.entities.Pedido;
 import pe.edu.upeu.examen.entities.Plato;
@@ -37,24 +37,40 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     @Transactional
     public Pedido guardar(PedidoDTO pedidoDto) {
-        // 1. Creamos la instancia del Pedido
         Pedido pedido = new Pedido();
         pedido.setNumeroMesa(pedidoDto.getNumeroMesa());
 
-        // 2. Buscamos el CLIENTE por el ID que viene del JSON
         Cliente cliente = clienteRepo.findById(pedidoDto.getCliente_id())
-                .orElseThrow(() -> new RuntimeException("Error: Cliente no encontrado con ID " + pedidoDto.getCliente_id()));
-
-        // 3. Buscamos el PLATO por el ID que viene del JSON
+                .orElseThrow(() -> new RuntimeException("Error: Cliente no encontrado"));
         Plato plato = platoRepo.findById(pedidoDto.getPlato_id())
-                .orElseThrow(() -> new RuntimeException("Error: Plato no encontrado con ID " + pedidoDto.getPlato_id()));
+                .orElseThrow(() -> new RuntimeException("Error: Plato no encontrado"));
 
-        // 4. Asignamos los objetos encontrados al pedido
         pedido.setCliente(cliente);
         pedido.setPlato(plato);
 
-        // 5. Guardamos
         return repo.save(pedido);
+    }
+
+    @Transactional
+    @Override
+    public Pedido actualizar(Long id, PedidoDTO pedidoDto) {
+        Pedido pedidoExistente = repo.findById(id).orElse(null);
+        if (pedidoExistente == null) {
+            return null;
+        }
+
+        pedidoExistente.setNumeroMesa(pedidoDto.getNumeroMesa());
+
+        Cliente cliente = clienteRepo.findById(pedidoDto.getCliente_id())
+                .orElseThrow(() -> new RuntimeException("Error al actualizar: Cliente no encontrado"));
+
+        Plato plato = platoRepo.findById(pedidoDto.getPlato_id())
+                .orElseThrow(() -> new RuntimeException("Error al actualizar: Plato no encontrado"));
+
+        pedidoExistente.setCliente(cliente);
+        pedidoExistente.setPlato(plato);
+
+        return repo.save(pedidoExistente);
     }
 
     @Override

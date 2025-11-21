@@ -33,8 +33,6 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity<Pedido> guardar(@RequestBody PedidoDTO pedidoDto) {
-        // Aquí recibimos el JSON { "cliente_id": 1, "plato_id": 5, ... }
-        // Y el service se encarga de convertirlo
         Pedido nuevoPedido = pedidoService.guardar(pedidoDto);
         return new ResponseEntity<>(nuevoPedido, HttpStatus.CREATED);
     }
@@ -43,5 +41,13 @@ public class PedidoController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         pedidoService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Pedido> actualizar(@PathVariable Long id, @RequestBody PedidoDTO pedidoDto) {
+        Pedido pedidoActualizado = pedidoService.actualizar(id, pedidoDto);
+        if (pedidoActualizado == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(pedidoActualizado);
     }
 }
